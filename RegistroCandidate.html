@@ -1,0 +1,151 @@
+<htm>
+    <head>
+        <!-- CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+        
+        <script src="https://code.jquery.com/jquery-3.0.0.js" crossorigin="anonymous"></script>
+        <!-- jQuery and JS bundle w/ Popper.js -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+     <script>
+        var editar = false;
+        window.onload = function() {
+           var id = $.urlParam('id');
+           console.log(id);
+           if(id != null){
+               editar = true;
+               $("txtcodeid").val(id);
+               PintarUsuario(id);
+           }
+        };
+
+        $.urlParam = function(name){
+            var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+            if (results==null) {
+            return null;
+            }
+            return decodeURI(results[1]) || 0;
+        }
+
+        function IrFormularioInicio(){
+            window.location = "InicioCandidate.html";
+        }
+
+        function PintarUsuario(id){
+
+            $.get("http://localhost:44350/api/Candidate/" + id)
+            .done(function( response ) {
+                var bithdateconvert;
+                console.log(response);
+                $("#txtid_candidate").val(response.ID_CANDIDATE),
+                $("#txtname").val(response.NAME),
+                $("#txtsurname").val(response.SURNAME),
+                $("#txtbirthdate").val(response.BIRTHDATE),
+                $("#txtemail").val(response.EMAIL),
+                $("#txtinsertdate").val(response.INSERTDATE),
+                $("#txtmodifydate").val(response.MODIFYDATE)
+            });
+
+        }
+
+
+        function GuardarUsuario(){
+            if(editar){
+                
+                var data = {
+                    ID_CANDIDATE : $("#txtid_candidate").val(),
+                    NAME : $("#txtname").val(),
+                    SURNAME : $("#txtsurname").val(),
+                    BIRTHDATE : $("#txtbirthdate").val(),
+                    EMAIL : $("#txtemail").val()
+                }
+
+                $.ajax({
+                method: "PUT",
+                url: "http://localhost:44350/api/Candidate/put",
+                contentType: 'application/json',
+                data: JSON.stringify(data), // access in body
+                })
+                .done(function( response ) {
+                    console.log(response);
+                    if(response){
+                        alert("Se guardaron los cambios");
+                        window.location = "InicioCandidate.html";
+                    }else{
+                        alert("Error al Modificar");
+                        console.log(data);
+                    }
+                });
+
+            }else{
+
+                var data = {
+                    ID_CANDIDATE : $("#txtid_candidate").val(),
+                    NAME : $("#txtname").val(),
+                    SURNAME : $("#txtsurname").val(),
+                    BIRTHDATE : $("#txtbirthdate").val(),
+                    EMAIL : $("#txtemail").val()
+                }
+                console.log(data)
+
+                $.post("http://localhost:44350/api/Candidate/post", data)
+                .done(function(response) {
+                    console.log(response);
+                    if(response){
+                        alert("Usuario Creado");
+                        window.location = "InicioCandidate.html";
+                    }else{
+                        alert("Error al crear");
+                    }
+                });
+            }
+
+        }
+
+        
+
+    </script>
+    </head>
+    <body>
+        <div class="container">
+
+            <div class="row mt-3">
+              <div class="col-12">
+                <form>
+                    <input type="text" id="txtcodeid" style="display: none;"/>
+                    <div class="form-group" style="display: none;">
+                      <label for="">ID CANDIDATE</label>
+                      <input type="text" class="form-control" id="txtid_candidate" placeholder="">
+                    </div>
+                    <div class="form-group">
+                      <label for="">NAME</label>
+                      <input type="text" class="form-control" id="txtname" placeholder="">
+                    </div>
+                    <div class="form-group">
+                      <label for="">SURNAME</label>
+                      <input type="text" class="form-control" id="txtsurname" placeholder="">
+                    </div>
+                    <div class="form-group">
+                      <label for="">BIRTH DATE</label>
+                      <input type="datetime-local" class="form-control" id="txtbirthdate" placeholder="">
+                    </div>
+                     <div class="form-group">
+                      <label for="">EMAIL</label>
+                      <input type="text" class="form-control" id="txtemail" placeholder="">
+                    </div>
+                    <div class="form-group"  style="display: none;">
+                      <label for="">INSERT DATE</label>
+                      <input type="datetime-local" class="form-control" id="txtinsertdate" placeholder="" readonly>
+                    </div>
+                    <div class="form-group" style="display: none;">
+                      <label for="">MODIFY DATE</label>
+                      <input type="datetime-local" class="form-control" id="txtmodifydate" placeholder="">
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="GuardarUsuario();">Guardar</button>
+                    <button type="button" class="btn btn-warning" onclick="IrFormularioInicio()">Volver</button>
+                  </form>
+              </div>
+            </div>
+          </div>
+    </body>
+   
+</htm>
